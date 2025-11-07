@@ -24,30 +24,45 @@ public class TransactionConsumer {
     private final KafkaTemplate<String, Object> kafka;
     private final String retryTopic;
 
-    public TransactionConsumer(TransactionRepository repo, ProcessingService processing, IdempotencyService idem,
+    public TransactionConsumer(TransactionRepository repo,
+                               ProcessingService processing,
+                               IdempotencyService idem,
                                KafkaTemplate<String, Object> kafka,
                                @Value("${app.kafka.topics.retry}") String retryTopic) {
-        this.repo = repo; this.processing = processing; this.idem = idem; this.kafka = kafka; this.retryTopic = retryTopic;
+        this.repo = repo;
+        this.processing = processing;
+        this.idem = idem;
+        this.kafka = kafka;
+        this.retryTopic = retryTopic;
     }
 
-    @KafkaListener(topics = "tx.received", containerFactory = "kafkaListenerContainerFactory")
-    public void onMessage(ConsumerRecord<String,Object> record, @Payload Map<String,Object> payload){
+    @KafkaListener(
+            topics = "${app.kafka.topics.received}",
+            groupId = "${spring.kafka.consumer.group-id}"
+    )
+    public void onMessage(Map<String, Object> payload) {
         String idemKey = (String) payload.get("idemKey");
         var id = UUID.fromString((String) payload.get("id"));
 
+        System.out.println("🔥 [WORKER] Mensaje recibido: " + payload);
+
         repo.findById(id)
                 .switchIfEmpty(Mono.defer(() -> {
-                    // reconstrucción defensiva si aplica
                     var e = new TransactionEntity();
-                    e.id = id; e.idemKey = idemKey; e.amount = new BigDecimal(payload.getOrDefault("amount","0").toString());
-                    e.payload = "{}"; e.status = "RECEIVED"; e.attempts = 0; return repo.save(e);
+                    e.id = id;
+                    e.idemKey = idemKey;
+                    e.amount = new BigDecimal(payload.getOrDefault("amount", "0").toString());
+                    e.payload = "{}";
+                    e.status = "RECEIVED";
+                    e.attempts = 0;
+                    return repo.save(e);
                 }))
                 .flatMap(t -> idem.tryLockProcessing(idemKey)
                         .flatMap(locked -> locked ? processing.process(t) : Mono.empty())
                 )
-                .doOnError(ex -> {
-                    // Enviar a retry con attempts + 1
+                .onErrorResume(ex -> {
                     int attempts = ((Number) payload.getOrDefault("attempts", 0)).intValue() + 1;
+                    System.out.println("⚠️ Error procesando " + idemKey + " → reenviando a retry (" + attempts + ")");
                     kafka.send(retryTopic, idemKey, Map.of(
                             "id", payload.get("id"),
                             "idemKey", idemKey,
@@ -55,7 +70,9 @@ public class TransactionConsumer {
                             "payload", payload.get("payload"),
                             "attempts", attempts
                     ));
+                    return Mono.empty();
                 })
                 .subscribe();
     }
+
 }

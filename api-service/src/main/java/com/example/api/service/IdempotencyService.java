@@ -19,11 +19,13 @@ public class IdempotencyService {
     // Devuelve true si pudo registrar (no existía)
     public Mono<Boolean> tryRegister(String key) {
         String redisKey = "idem:" + key;
+        System.out.println("redisKey: " + redisKey);
         return redis.opsForValue().setIfAbsent(redisKey, "PENDING", ttl)
                 .map(Boolean::booleanValue);
     }
 
     public Mono<Void> markDone(String key) {
+        System.out.println("markDone: " + key);
         return redis.opsForValue().set("idem:"+key, "DONE", ttl).then();
     }
 }

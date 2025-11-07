@@ -9,6 +9,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.UUID;
 
+@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/transactions")
 public class TransactionController {

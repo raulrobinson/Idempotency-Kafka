@@ -16,7 +16,11 @@ spring:
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
         spring.json.trusted.packages: "*"
-        spring.json.value.default.type: java.util.Map
+        spring.json.value.default.type: java.util.LinkedHashMap
+        spring.json.use.type.headers: false   # 👈 Desactiva cabeceras de tipo
+        spring.json.add.type.headers: false   # 👈 Consistencia con el producer
+      auto-offset-reset: earliest
+      enable-auto-commit: false
 
   data:
     redis:

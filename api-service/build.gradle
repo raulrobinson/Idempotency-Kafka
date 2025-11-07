@@ -15,7 +15,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-r2dbc'
     implementation 'org.springframework.boot:spring-boot-starter-data-redis-reactive'
     implementation 'org.springframework.kafka:spring-kafka'
-    runtimeOnly 'org.postgresql:r2dbc-postgresql'
+    // https://mvnrepository.com/artifact/org.postgresql/r2dbc-postgresql
+    implementation 'org.postgresql:r2dbc-postgresql:1.1.1.RELEASE'
     implementation 'io.projectreactor:reactor-core'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
