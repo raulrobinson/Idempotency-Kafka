@@ -30,7 +30,11 @@ public class RetryConsumer {
         this.maxAttempts = maxAttempts; this.baseBackoffMs = baseBackoffMs; this.dlqTopic = dlqTopic;
     }
 
-    @KafkaListener(topics = "tx.retry", containerFactory = "kafkaListenerContainerFactory", groupId = "worker-retry")
+    @KafkaListener(
+            topics = "tx.retry",
+            containerFactory = "kafkaListenerContainerFactory",
+            groupId = "worker-retry"
+    )
     public void onRetry(ConsumerRecord<String,Object> record, @Payload Map<String,Object> payload) {
         int attempts = ((Number) payload.getOrDefault("attempts", 0)).intValue();
         var id = UUID.fromString((String) payload.get("id"));

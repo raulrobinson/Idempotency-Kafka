@@ -9,7 +9,7 @@ Este laboratorio implementa un flujo **asíncrono** de procesamiento de transacc
 
 ## Estructura de proyecto
 
-```
+```text
 lab-idempotency/
 ├─ docker-compose.yml
 ├─ .env
