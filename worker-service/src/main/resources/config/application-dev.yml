@@ -1,10 +1,10 @@
 spring:
   r2dbc:
-    url: ${SPRING_R2DBC_URL:r2dbc:postgresql://localhost:5432/txdb}
-    username: ${SPRING_R2DBC_USERNAME:txuser}
-    password: ${SPRING_R2DBC_PASSWORD:txpass}
+    url: ${SPRING_R2DBC_URL}
+    username: ${SPRING_R2DBC_USERNAME}
+    password: ${SPRING_R2DBC_PASSWORD}
   kafka:
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:29092}
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
     consumer:
       group-id: worker
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
@@ -14,8 +14,8 @@ spring:
         spring.json.value.default.type: java.util.Map
   data:
     redis:
-      host: ${SPRING_REDIS_HOST:localhost}
-      port: ${SPRING_REDIS_PORT:6379}
+      host: ${SPRING_REDIS_HOST}
+      port: ${SPRING_REDIS_PORT}
 
 app:
   kafka:

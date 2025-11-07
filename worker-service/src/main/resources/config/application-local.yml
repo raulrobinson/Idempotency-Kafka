@@ -1,0 +1,36 @@
+server:
+  port: 8082
+
+spring:
+
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5432/txdb
+    username: txuser
+    password: txpass
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: worker
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+        spring.json.value.default.type: java.util.Map
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+app:
+  kafka:
+    topics:
+      received: tx.received
+      retry: tx.retry
+      dlq: tx.dlq
+  retry:
+    maxAttempts: 3
+    baseBackoffMs: 2000
+  idempotency:
+    ttlSeconds: 3600
