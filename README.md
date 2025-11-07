@@ -1,4 +1,4 @@
-# 🧪 Laboratorio completo: Idempotencia + Redis + Postgres + Kafka + Workers (retry)
+# Laboratorio: Idempotencia + Redis + Postgres + Kafka + Workers (retry)
 
 Este laboratorio implementa un flujo **asíncrono** de procesamiento de transacciones con **idempotencia** usando **Redis** como *dedupe store*, **PostgreSQL** como persistencia, **Kafka** como *bus* de eventos, y **dos consumidores**: uno principal y otro de **reintentos** (backoff + DLQ).
 
